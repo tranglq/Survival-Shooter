@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnitySampleAssets.CrossPlatformInput;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     Animator anim;
     Rigidbody playerRigidbody;
     int floorMask;
-    float camRayLength = 100f;
+//    float camRayLength = 100f;
 
     private void Awake()
     {
@@ -19,8 +20,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+        float v = CrossPlatformInputManager.GetAxisRaw("Vertical");
 
         Move(h, v);
         Turning();
@@ -36,14 +37,13 @@ public class PlayerMovement : MonoBehaviour
 
     void Turning()
     {
-        Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        RaycastHit floorHit;
+        Vector3 turnDir = new Vector3(CrossPlatformInputManager.GetAxisRaw("Mouse X"), 0f, CrossPlatformInputManager.GetAxisRaw("Mouse Y"));
 
-        if(Physics.Raycast (camRay, out floorHit, camRayLength, floorMask))
+        if (turnDir != Vector3.zero)
         {
-            Vector3 playerToMouse = floorHit.point - transform.position;
-            playerToMouse.y = 0.0f;
+            Vector3 playerToMouse = (transform.position + turnDir) - transform.position;
+            playerToMouse.y = 0f;
 
             Quaternion newRotation = Quaternion.LookRotation(playerToMouse);
             playerRigidbody.MoveRotation(newRotation); 
